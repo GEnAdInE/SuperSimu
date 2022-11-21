@@ -1,40 +1,6 @@
+# dureesSimulation = [40, 80, 160, 240]
 
-
-
-
-
-# Echeancier d'evenements
-echeancier = Echeancier()
-dateSysteme = 0
-nbBus = 0
-dureesSimulation = [40, 80, 160, 240]
-
-
-
-# Fonction d'initialisation de la simulation
-def debutSimulation(nbHeures):
-    global dateSysteme
-    dateSysteme = 0
-    echeancier.ajouter(dateSysteme + nbHeures * 60, finSimulation)
-    arriveeBus()
-
-
-# Arrivee d'un bus
-def arriveeBus():
-    global dateSysteme, nbBus
-
-    nbBus += 1
-
-    # Ajout d'un évenement d'arrivée dans la file de controle
-    echeancier.ajouter(dateSysteme, arriveeFileC)
-
-    # Ajout d'un nouvel evenement suivant la loi exponentielle de paramètre 1/2
-    echeancier.ajouter(dateSysteme + random.expovariate(0.5), arriveeBus)
-
-
-
-
-for duree in dureesSimulation:
+'''for duree in dureesSimulation:
     init(duree)
 
     while echeancier:
@@ -44,77 +10,88 @@ for duree in dureesSimulation:
         # On execute l'evenement
         evenement[1]()
 
-    print("Fin de la simulation apres " + str(duree) + " heures")
+    print("Fin de la simulation apres " + str(duree) + " heures")'''
 
-import numpy as np
+import numpy.random as np
+import time
 
 class Schedule:
     
     def __init__(self, duree):
         self.duree_simulation = duree
         self.schedule = []
+    
+    # Arrivee d'un bus
+    def arriveeBus(self):
+        self.nbBus += 1
 
-    def arriveFileReparation(self):
-        self.Q2 += 1
-        self.nbBusRepair += 1
-        if self.B2 < 2:
-            self.schedule.append("AccesGuichetR", 0)
+        # Ajout d'un évenement d'arrivée dans la file de controle
+        self.schedule.append("ArriveFileControle", 0)
+
+        # Ajout d'un nouvel evenement suivant la loi exponentielle de paramètre 0.5
+        self.schedule.append((self.arriveesBus,time.time + np.exponential((4/3)) * 120)) # 120min = 2h
             
+    # arrivé bus dans la file de controle
     def arriveFileControle(self):
         self.Q1 = self.Q1 + 1
         if self.Q1 == 1:
             self.schedule.append("AccesGuichetC", 0)
         
+    # accès guichet controle
     def accesPosteControle(self):
         self.Q1 -= 1
         self.B1 = False
-        self.schedule.append("DepartControle", "AJOUTER TEMPS")    
-    
+        self.schedule.append("DepartControle", time.time + np.uniform(0.25, 13/12))
 
+    def departPosteControl(self):
+        
+        self.B1 = True
+        if self.Q1 > 0:
+            # Ici mettre date à l'heure précis
+            self.schedule.append("AccesGuichetC", 0)
+        if np.uniform(0, 1) < 0.3:
 
-def departPosteControl():
-    global statusControl
-    statusControl = 0
-    if NombreBusFileControl > 0:
-        # Ici mettre date à l'heure précis
-        AccesControl()
-    if np.random.normal(0, 1) < 0.3:
-        # Ici mettre date à l'heure précis
-        AccesFileR()
+            # Ici mettre date à l'heure précis
+            self.schedule.append("AccesFileRéparation", 0)
 
-def AccesPosteControle():
-    global fileDattControle
-    global posteControlStatus
-    fileDattControle = fileDattControle - 1
-    posteControlStatus = False
-    DepartPosteControle() #TODO : truc de temps
+    # accès guichet réparation
+    def arriveFileReparation(self):
+        self.Q2 += 1
+        self.nbBusRepair += 1
+        if self.B2 < 2:
+            self.schedule.append("AccesGuichetR", 0)
 
-def AccesPosteReparation():
-    global fileDattRepairs
-    global posteReparation1Status
-    fileDattRepairs = fileDattRepairs - 1
-    posteReparation1Status = False
-    DepartPosteReparation1() #TODO : truc de temps
-
-def DepartReparation():
-        global posteReparation1Status
-        posteReparation1Status = True
-        if fileDattRepairs > 0:
-            #Prendre en compte le temps ma gatée
-            AccesReparation()
-
-    def AccesPosteReparation(self):
+    # accès guichet réparation
+    def accesPosteReparation(self):
+        
         self.Q2 -= 1
         self.B2 += 1
-        self.schedule.append("DepartReparation", "AJOUTER TEMPS")    
+        self.schedule.append("DepartReparation", time.time + np.uniform(168, 330))
+
+    def departReparation(self):
+        
+        self.B2 -= 1
+        if self.Q2 > 0:
+            
+            self.schedule.append("AccesGuichetR", 0)
 
 
-def DebutSimu(dureeSimu):
-    global NbBus,NbBusRep,AireQc,AireQr,AireBr,Qc,Qr,Bc,Br
+    def DebutSimu(self):
+        
+        self.nbBus = 0
+        self.nbBusRepair = 0
+        self.Q1 = 0
+        self.Q2 = 0
+        self.B1 = True
+        self.B2 = 0
 
-    NbBus,NbBusRep,AireQc,AireQr,AireBrr,Qc,Qr = 0,0,0,0,0,0,0
-    Bc,Br = False,False
-    ArriveBus() # a data x
-    #TODO : FAIRE FIN DANS dureeSimu
+        self.AireQ1 = 0
+        self.AireQ2 = 0
+        self.AireB2 = 0
+
+
+        self.schedule.append((self.arriveesBus,time.time + np.exponential((4/3)) * 120)) # 120min = 2h
+        ArriveBus() # a data x
+        #TODO : FAIRE FIN DANS dureeSimu
 
 
