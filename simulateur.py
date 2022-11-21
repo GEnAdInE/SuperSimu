@@ -4,6 +4,7 @@ def ArriveFile1(Q1):
     Q1 = Q1 + 1
     if Q1 == 1:
         Schedule("AccesGuichet1", 0)
+    return Q1
 
 # fonction d'exécution des evenements
 def Schedule(event, delay):
