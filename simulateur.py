@@ -1,9 +1,14 @@
 # file d'attente station contrôle  
+Q1 = 0
 
-def ArriveFile1(Q1):
+# État guichet contrôle
+B1 = False
+
+def ArriveFile1():
+    global Q1, B1
     Q1 = Q1 + 1
     if Q1 == 1:
-        Schedule("AccesGuichet1", 0)
+        Schedule("AccesGuichetC", 0)
     return Q1
 
 # fonction d'exécution des evenements
