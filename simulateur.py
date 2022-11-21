@@ -17,10 +17,6 @@ import time
 
 class Schedule:
     
-    def __init__(self, duree):
-        self.duree_simulation = duree
-        self.schedule = []
-    
     # Arrivee d'un bus
     def arriveeBus(self):
         self.nbBus += 1
@@ -87,7 +83,22 @@ class Schedule:
         self.AireQ1 = 0
         self.AireQ2 = 0
         self.AireB2 = 0
-
-
+        
         self.schedule.append((self.arriveesBus, self.heureSysteme + np.exponential((4/3)) * 120)) # 120min = 2h
         # mettre fin de simu à self.duree_simulation
+
+
+
+
+  def FinSimulation(self):
+
+      # TODO : Vider l'échéancier
+      # TODO : Changer variables
+      # TODO : Ajouter variable pour nb d'heures de simulation
+
+      print("Temps d'attention moyen avant contrôle : ", self.AireQ1 / self.nbBus)
+      print("Temps d'attention moyen avant réparation : ", self.AireQ2 / self.nbBusRepair)
+      print("Temps d'utilisation moyen du centre de réparation : ", self.AireB2 / (2 * self.duree))
+
+        
+
