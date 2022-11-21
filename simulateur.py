@@ -34,12 +34,12 @@ def Schedule(event, delay):
     print("Time = ", Time, "Event = ", event)
     
 
-def departPosteControl():
+def DepartPosteControl():
     global statusControl
     statusControl = 0
     if NombreBusFileControl > 0:
         # Ici mettre date à l'heure précis
-        AccesControl()
+        AccesPosteControle()
     if np.random.normal(0, 1) < 0.3:
         # Ici mettre date à l'heure précis
         AccesFileR()
@@ -48,12 +48,21 @@ def AccesPosteControle():
     global fileDattControle
     global posteControlStatus
     fileDattControle = fileDattControle - 1
-    posteControlStatus = False
-    DepartPosteControle() #TODO : truc de temps
+    posteControlStatus = True
+    DepartPosteControl() #TODO : truc de temps
 
 def AccesPosteReparation():
     global fileDattRepairs
     global posteReparation1Status
     fileDattRepairs = fileDattRepairs - 1
-    posteReparation1Status = False
+    posteReparation1Status = True
     DepartPosteReparation1() #TODO : truc de temps
+
+
+def DebutSimu(dureeSimu):
+    global NbBus,NbBusRep,AireQc,AireQr,AireBr,Qc,Qr,Bc,Br
+
+    NbBus,NbBusRep,AireQc,AireQr,AireBrr,Qc,Qr = 0,0,0,0,0,0,0
+    Bc,Br = False,False
+    ArriveBus() # a data x
+    #TODO : FAIRE FIN DANS dureeSimu
