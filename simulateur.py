@@ -13,13 +13,35 @@
     print("Fin de la simulation apres " + str(duree) + " heures")'''
 
 import numpy.random as np
-import time
 
-class Schedule:
+
+class Echeancier(list):
+    def __init__(self, *args, **kwargs):
+        super(Echeancier, self).__init__(*args, **kwargs)
+
+    # Override de la method append pour ajouter un evenement
+    def append(self, evenement):
+        super(Echeancier, self).append(evenement)
+
+        # On trie la liste par date (1er element du tuple)
+        self.sort(key=lambda x: x[0])
+        
+
+    def ajouter(self, date, evenement):
+        self.append((date, evenement))
+
+    def prochain(self):
+        return self.pop(0)
+
+    def __str__(self):
+        return str(self)
+
+
+class Simulateur:
 
     def __init__(self, duree):
         self.duree_simulation = duree
-        self.schedule = []
+        self.schedule = Echeancier()
         self.DebutSimu()
     
     # Arrivee d'un bus
