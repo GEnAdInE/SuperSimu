@@ -2,9 +2,21 @@
 import numpy as np
 
 
+# file d'attente station contrôle  
+Q1 = 0
 Q2 = 0
+
+# État guichet contrôle
+B1 = False
 B2 = 0
+
+nbBusTotal = 0
 nbBusRepair = 0
+statusControl = 0
+fileDattControle = 0
+fileDattRepairs = 0
+posteReparation1Status = 0
+
 
 def ArriveFile2():
     global Q2, B2, nbBusRepair
@@ -14,11 +26,6 @@ def ArriveFile2():
         Shedule("AccesGuichet2", 0)
     return Q2
     
-# file d'attente station contrôle  
-Q1 = 0
-
-# État guichet contrôle
-B1 = False
 
 def ArriveFile1():
     global Q1, B1
@@ -51,9 +58,21 @@ def AccesPosteControle():
     posteControlStatus = False
     DepartPosteControle() #TODO : truc de temps
 
+
 def AccesPosteReparation():
     global fileDattRepairs
     global posteReparation1Status
     fileDattRepairs = fileDattRepairs - 1
     posteReparation1Status = False
     DepartPosteReparation1() #TODO : truc de temps
+
+
+def FinSimulation():
+    
+    # TODO : Vider l'échéancier
+    # TODO : Changer variables
+    # TODO : Ajouter variable pour nb d'heures de simulation
+
+    print("Temps d'attention moyen avant contrôle : ", aireFileControle / nbBusTotal)
+    print("Temps d'attention moyen avant réparation : ", aireFileRepair / nbBusRepair)
+    print("Temps d'utilisation moyen du centre de réparation : ", aireGuichetRepair / (2 * 160))
