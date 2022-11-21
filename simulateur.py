@@ -57,3 +57,11 @@ def AccesPosteReparation():
     fileDattRepairs = fileDattRepairs - 1
     posteReparation1Status = False
     DepartPosteReparation1() #TODO : truc de temps
+
+def DepartReparation():
+        global posteReparation1Status
+        posteReparation1Status = True
+        if fileDattRepairs > 0:
+            #Prendre en compte le temps ma gatée
+            AccesReparation()
+
