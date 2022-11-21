@@ -3,7 +3,7 @@
 def ArriveFile1(Q1):
     Q1 = Q1 + 1
     if Q1 == 1:
-        Schedule("DepartFile1", 0.5)
+        Schedule("AccesGuichet1", 0)
 
 # fonction d'exécution des evenements
 def Schedule(event, delay):
