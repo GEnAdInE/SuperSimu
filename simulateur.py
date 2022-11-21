@@ -1,5 +1,4 @@
 # file d'attente station contrôle  
-Q1 = 0
 
 def ArriveFile1(Q1):
     Q1 = Q1 + 1
