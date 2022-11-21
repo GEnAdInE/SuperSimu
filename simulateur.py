@@ -1,4 +1,7 @@
 
+import numpy as np
+
+
 Q2 = 0
 B2 = 0
 nbBusRepair = 0
@@ -31,7 +34,15 @@ def Schedule(event, delay):
     print("Time = ", Time, "Event = ", event)
     
 
-# TODO tous niquer
+def departPosteControl():
+    global statusControl
+    statusControl = 0
+    if NombreBusFileControl > 0:
+        # Ici mettre date à l'heure précis
+        AccesControl()
+    if np.random.normal(0, 1) < 0.3:
+        # Ici mettre date à l'heure précis
+        AccesFileR()
 
 def AccesPosteControle():
     global fileDattControle
