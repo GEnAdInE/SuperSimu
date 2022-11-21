@@ -29,7 +29,7 @@ class Schedule:
         self.schedule.append("ArriveFileControle", 0)
 
         # Ajout d'un nouvel evenement suivant la loi exponentielle de paramètre 0.5
-        self.schedule.append((self.arriveesBus,time.time + np.exponential((4/3)) * 120)) # 120min = 2h
+        self.schedule.append((self.arriveesBus,self.heureSysteme + np.exponential((4/3)) * 120)) # 120min = 2h
             
     # arrivé bus dans la file de controle
     def arriveFileControle(self):
@@ -41,7 +41,7 @@ class Schedule:
     def accesPosteControle(self):
         self.Q1 -= 1
         self.B1 = False
-        self.schedule.append("DepartControle", time.time + np.uniform(0.25, 13/12))
+        self.schedule.append("DepartControle", self.heureSysteme + np.uniform(0.25, 13/12))
 
     def departPosteControl(self):
         
@@ -66,7 +66,7 @@ class Schedule:
         
         self.Q2 -= 1
         self.B2 += 1
-        self.schedule.append("DepartReparation", time.time + np.uniform(168, 330))
+        self.schedule.append("DepartReparation", self.heureSysteme + np.uniform(168, 330))
 
     def departReparation(self):
         
@@ -75,9 +75,8 @@ class Schedule:
             
             self.schedule.append("AccesGuichetR", 0)
 
-
     def DebutSimu(self):
-        
+        self.heureSysteme = 0
         self.nbBus = 0
         self.nbBusRepair = 0
         self.Q1 = 0
@@ -90,8 +89,5 @@ class Schedule:
         self.AireB2 = 0
 
 
-        self.schedule.append((self.arriveesBus,time.time + np.exponential((4/3)) * 120)) # 120min = 2h
-        ArriveBus() # a data x
-        #TODO : FAIRE FIN DANS dureeSimu
-
-
+        self.schedule.append((self.arriveesBus, self.heureSysteme + np.exponential((4/3)) * 120)) # 120min = 2h
+        # mettre fin de simu à self.duree_simulation
