@@ -1,11 +1,12 @@
 Q2 = 0
-B2 = False
+B2 = 0
+nbBusRepair = 0
 
 def ArriveFile2():
-    global Q2, B2
+    global Q2, B2, nbBusRepair
     Q2 += 1
-    if not B2:
-        B2 = True
+    nbBusRepair += 1
+    if B2 < 2:
         Shedule("AccesGuichet2", 0)
     return Q2
 
