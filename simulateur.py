@@ -6,9 +6,9 @@ class Echeancier(list):
     # Override de la method append pour ajouter un evenement
     def append(self, evenement):
         super(Echeancier, self).append(evenement)
-
+        
         # On trie la liste par date (1er element du tuple)
-        self.sort(key=lambda x: x[0])
+        self.sort(key=lambda x: x[1])
         
 
     def ajouter(self, date, evenement):
@@ -116,9 +116,12 @@ class Simulateur:
 
         self.schedule.clear()
 
-        print("Temps d'attention moyen avant contrôle : ", self.AireQ1 / self.nbBus)
-        print("Temps d'attention moyen avant réparation : ", self.AireQ2 / self.nbBusRepair)
-        print("Temps d'utilisation moyen du centre de réparation : ", self.AireB2 / (2 * self.duree))
+        if (self.nbBus > 0):
+            print("Temps d'attention moyen avant contrôle : ", self.AireQ1 / self.nbBus)
+        if (self.nbBusRepair > 0):
+            print("Temps d'attention moyen avant réparation : ", self.AireQ2 / self.nbBusRepair)
+        
+        print("Temps d'utilisation moyen du centre de réparation : ", self.AireB2 / (2 * self.duree_simulation))
 
     def MAJAires(self, nextDate):
         self.AireQ1 += self.Q1 * (nextDate - self.heureSysteme)
@@ -145,7 +148,7 @@ class Simulateur:
             self.heureSysteme = nextEvent[1]
 
             print("Heure système : ", self.heureSysteme)
-            print("Evenement : ", nextEvent[0])
+            print("Evenement : ", nextEvent[0].__name__)
 
             # Execution de l'evenement
             nextEvent[0]()
