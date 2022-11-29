@@ -115,11 +115,13 @@ class Simulateur:
 
         self.schedule.clear()
         if (self.nbBus > 0):
-            print("Temps d'attention moyen avant contrôle : ", (self.AireQ1 / self.nbBus) / 60)
+            print("Temps d'attente moyen avant contrôle : ", (self.AireQ1 / self.nbBus) / 60)
+            print("Temps d'attente moyen avant contrôle (sans file) : ", (self.AireQ1 / (self.nbBus - self.Q1)) / 60, "(total bus contrôle : {} \tdans la file: {})".format(self.nbBus, self.Q1))
         if (self.nbBusRepair > 0):
-            print("Temps d'attention moyen avant réparation : ", (self.AireQ2 / self.nbBusRepair) / 60)
+            print("Temps d'attente moyen avant réparation : ", (self.AireQ2 / self.nbBusRepair) / 60)
+            print("Temps d'attente moyen avant réparation (sans file) : ", (self.AireQ2 / (self.nbBusRepair - self.Q2)) / 60, "(total bus reparation : {} \tdans la file: {})".format(self.nbBusRepair, self.Q2))
         
-        print("Temps d'utilisation moyen du centre de réparation : ", self.AireB2 / (2 * self.duree_simulation))
+        print("Temps d'utilisation moyen du centre de réparation : ", self.AireB2 / (2 * self.duree_simulation), "\n")
 
     def MAJAires(self, nextDate):
         self.AireQ1 += self.Q1 * (nextDate - self.heureSysteme)
@@ -145,8 +147,8 @@ class Simulateur:
             # Mise à jour de l'heure système
             self.heureSysteme = nextEvent[1]
 
-            print("Heure système : ", self.heureSysteme / 60, "h")
-            print("Evenement : ", nextEvent[0].__name__)
+            # print("Heure système : ", self.heureSysteme / 60, "h")
+            # print("Evenement : ", nextEvent[0].__name__)
 
             # Execution de l'evenement
             nextEvent[0]()
@@ -154,9 +156,9 @@ class Simulateur:
         # Fin de la simulation
 
 if __name__ == '__main__': 
-    dureesSimulation = [40, 80, 160, 240]
+    dureesSimulation = [240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240]
     for duree in dureesSimulation:
-        print("Simulation de durée : ", duree)
+        # print("Simulation de durée : ", duree)
         simulateur = Simulateur(duree * 60)
         simulateur.run()
-        print("Fin de la simulation : ", duree)
+        # print("Fin de la simulation : ", duree)
