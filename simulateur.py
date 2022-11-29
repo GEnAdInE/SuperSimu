@@ -62,7 +62,7 @@ class Simulateur:
     def accesPosteControle(self):
         self.Q1 -= 1
         self.B1 = False
-        self.schedule.append((self.departPosteControl, self.heureSysteme + np.uniform(0.25, 13/12)))
+        self.schedule.append((self.departPosteControl, self.heureSysteme + np.uniform(15, 65)))
 
     def departPosteControl(self):
         
@@ -86,7 +86,7 @@ class Simulateur:
         
         self.Q2 -= 1
         self.B2 += 1
-        self.schedule.append((self.departReparation, self.heureSysteme + np.uniform(168, 330)))
+        self.schedule.append((self.departReparation, self.heureSysteme + np.uniform(126, 270)))
 
     def departReparation(self):
 
