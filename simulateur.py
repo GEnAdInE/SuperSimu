@@ -1,4 +1,5 @@
 import numpy.random as np
+from random import random
 class Echeancier(list):
     def __init__(self, *args, **kwargs):
         super(Echeancier, self).__init__(*args, **kwargs)
@@ -50,7 +51,7 @@ class Simulateur:
         self.schedule.append((self.arriveFileControle, self.heureSysteme))
 
         # Ajout d'un nouvel evenement suivant la loi exponentielle de paramètre 0.5
-        self.schedule.append((self.arriveeBus,self.heureSysteme + np.exponential((4/3)) * 120)) # 120min = 2h
+        self.schedule.append((self.arriveeBus,self.heureSysteme + np.exponential((4/3)) * 60)) # 120min = 2h
             
     # arrivé bus dans la file de controle
     def arriveFileControle(self):
@@ -69,7 +70,7 @@ class Simulateur:
         self.B1 = True
         if self.Q1 > 0:
             self.schedule.append((self.accesPosteControle, self.heureSysteme))
-        if np.uniform(0, 1) < 0.3:
+        if random() < 0.3:
 
             # Ici mettre date à l'heure précis
             self.schedule.append((self.arriveFileReparation, self.heureSysteme))
@@ -86,7 +87,7 @@ class Simulateur:
         
         self.Q2 -= 1
         self.B2 += 1
-        self.schedule.append((self.departReparation, self.heureSysteme + np.uniform(126, 270)))
+        self.schedule.append((self.departReparation, self.heureSysteme + np.uniform(168, 330)))
 
     def departReparation(self):
 
@@ -106,7 +107,7 @@ class Simulateur:
         self.AireQ2 = 0
         self.AireB2 = 0
         
-        self.schedule.append((self.arriveeBus, self.heureSysteme + np.exponential((4/3)) * 120)) # 120min = 2h
+        self.schedule.append((self.arriveeBus, self.heureSysteme + np.exponential((4/3)) * 60)) # 120min = 2h
         self.schedule.append((self.FinSimulation, self.duree_simulation))
 
     def FinSimulation(self):
@@ -124,6 +125,9 @@ class Simulateur:
         print("Temps d'utilisation moyen du centre de réparation : ", self.AireB2 / (2 * self.duree_simulation))
 
     def MAJAires(self, nextDate):
+        print(nextDate)
+        print(self.heureSysteme)
+        print(self.Q1)
         self.AireQ1 += self.Q1 * (nextDate - self.heureSysteme)
         self.AireQ2 += self.Q2 * (nextDate - self.heureSysteme)
         self.AireB2 += self.B2 * (nextDate - self.heureSysteme)
@@ -147,7 +151,7 @@ class Simulateur:
             # Mise à jour de l'heure système
             self.heureSysteme = nextEvent[1]
 
-            print("Heure système : ", self.heureSysteme)
+            print("Heure système : ", self.heureSysteme / 60, "h")
             print("Evenement : ", nextEvent[0].__name__)
 
             # Execution de l'evenement
