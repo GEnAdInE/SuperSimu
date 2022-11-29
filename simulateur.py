@@ -55,7 +55,7 @@ class Simulateur:
     # arrivé bus dans la file de controle
     def arriveFileControle(self):
         self.Q1 = self.Q1 + 1
-        if self.B1 == False:
+        if self.B1 == True:
             self.schedule.append((self.accesPosteControle, self.heureSysteme))
         
     # accès guichet controle
