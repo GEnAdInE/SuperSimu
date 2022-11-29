@@ -51,7 +51,7 @@ class Simulateur:
         self.schedule.append((self.arriveFileControle, self.heureSysteme))
 
         # Ajout d'un nouvel evenement suivant la loi exponentielle de paramètre 0.5
-        self.schedule.append((self.arriveeBus,self.heureSysteme + np.exponential((4/3)) * 60)) # 120min = 2h
+        self.schedule.append((self.arriveeBus,self.heureSysteme + np.exponential((3/4) * 60))) # 120min = 2h
             
     # arrivé bus dans la file de controle
     def arriveFileControle(self):
@@ -71,8 +71,6 @@ class Simulateur:
         if self.Q1 > 0:
             self.schedule.append((self.accesPosteControle, self.heureSysteme))
         if random() < 0.3:
-
-            # Ici mettre date à l'heure précis
             self.schedule.append((self.arriveFileReparation, self.heureSysteme))
 
     # accès guichet réparation
@@ -107,7 +105,7 @@ class Simulateur:
         self.AireQ2 = 0
         self.AireB2 = 0
         
-        self.schedule.append((self.arriveeBus, self.heureSysteme + np.exponential((4/3)) * 60)) # 120min = 2h
+        self.schedule.append((self.arriveeBus, self.heureSysteme + np.exponential((3/4) * 60))) # 120min = 2h
         self.schedule.append((self.FinSimulation, self.duree_simulation))
 
     def FinSimulation(self):
@@ -116,18 +114,14 @@ class Simulateur:
         # TODO : Ajouter variable pour nb d'heures de simulation
 
         self.schedule.clear()
-
         if (self.nbBus > 0):
-            print("Temps d'attention moyen avant contrôle : ", self.AireQ1 / self.nbBus)
+            print("Temps d'attention moyen avant contrôle : ", (self.AireQ1 / self.nbBus) / 60)
         if (self.nbBusRepair > 0):
-            print("Temps d'attention moyen avant réparation : ", self.AireQ2 / self.nbBusRepair)
+            print("Temps d'attention moyen avant réparation : ", (self.AireQ2 / self.nbBusRepair) / 60)
         
         print("Temps d'utilisation moyen du centre de réparation : ", self.AireB2 / (2 * self.duree_simulation))
 
     def MAJAires(self, nextDate):
-        print(nextDate)
-        print(self.heureSysteme)
-        print(self.Q1)
         self.AireQ1 += self.Q1 * (nextDate - self.heureSysteme)
         self.AireQ2 += self.Q2 * (nextDate - self.heureSysteme)
         self.AireB2 += self.B2 * (nextDate - self.heureSysteme)
