@@ -121,7 +121,7 @@ class Simulateur:
             print("Temps d'attente moyen avant réparation : ", (self.AireQ2 / self.nbBusRepair) / 60)
             print("Temps d'attente moyen avant réparation (sans file) : ", (self.AireQ2 / (self.nbBusRepair - self.Q2)) / 60, "(total bus reparation : {} \tdans la file: {})".format(self.nbBusRepair, self.Q2))
         
-        print("Temps d'utilisation moyen du centre de réparation : ", self.AireB2 / (2 * self.duree_simulation), "\n")
+        print("Temps d'utilisation moyen du centre de réparation : ", self.AireB2 / (2 * self.duree_simulation))
 
     def MAJAires(self, nextDate):
         self.AireQ1 += self.Q1 * (nextDate - self.heureSysteme)
@@ -158,7 +158,7 @@ class Simulateur:
 if __name__ == '__main__': 
     dureesSimulation = [40, 80, 160, 240]
     for duree in dureesSimulation:
-        # print("Simulation de durée : ", duree)
+        print("Simulation de durée : ", duree)
         simulateur = Simulateur(duree * 60)
         simulateur.run()
-        # print("Fin de la simulation : ", duree)
+        print("Fin de la simulation : ", duree, "\n")
