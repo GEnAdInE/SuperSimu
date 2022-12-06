@@ -108,10 +108,10 @@ class Simulateur:
         self.schedule.append((self.arriveeBus, self.heureSysteme + np.exponential((3/4) * 60))) # 120min = 2h
         self.schedule.append((self.FinSimulation, self.duree_simulation))
 
-    def FinSimulation(self):
+        self.attenteMaxQ1 = 0
+        self.attenteMaxQ2 = 0
 
-        # TODO : Changer variables
-        # TODO : Ajouter variable pour nb d'heures de simulation
+    def FinSimulation(self):
 
         self.schedule.clear()
         if (self.nbBus > 0):
@@ -127,6 +127,11 @@ class Simulateur:
         self.AireQ1 += self.Q1 * (nextDate - self.heureSysteme)
         self.AireQ2 += self.Q2 * (nextDate - self.heureSysteme)
         self.AireB2 += self.B2 * (nextDate - self.heureSysteme)
+        if (self.nbBus > 0):
+            self.attenteMaxQ1 = max((self.AireQ1 / self.nbBus) / 60, self.attenteMaxQ1)
+            
+        if (self.nbBusRepair > 0):
+            self.attenteMaxQ2 = max((self.AireQ2 / self.nbBusRepair) / 60, self.attenteMaxQ2)
 
     def run(self):
         # init heure système
@@ -156,9 +161,29 @@ class Simulateur:
         # Fin de la simulation
 
 if __name__ == '__main__': 
-    dureesSimulation = [240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240]
+
+    dureesSimulation = [40, 80, 160, 240]
     for duree in dureesSimulation:
-        # print("Simulation de durée : ", duree)
-        simulateur = Simulateur(duree * 60)
-        simulateur.run()
-        # print("Fin de la simulation : ", duree)
+        tempMoyenControlleTotal = 0
+        tempMoyenReparationTotal = 0
+        tauxUtilisationReparation = 0
+        Q1total = 0
+        Q2total = 0
+        maxAttenteQ1 = 0
+        maxAttenteQ2 = 0
+        for i in range(0, 1000):
+            print("Simulation n°", i)
+            simulateur = Simulateur(duree * 60)
+            simulateur.run()
+            tempMoyenControlleTotal += (simulateur.AireQ1 / (simulateur.nbBus - simulateur.Q1)) / 60
+            tempMoyenReparationTotal += (simulateur.AireQ2 / (simulateur.nbBusRepair - simulateur.Q2)) / 60
+            tauxUtilisationReparation += simulateur.AireB2 / (2 * simulateur.duree_simulation)
+            maxAttenteQ1 = max(maxAttenteQ1, simulateur.attenteMaxQ1)
+            maxAttenteQ2 = max(maxAttenteQ2, simulateur.attenteMaxQ2)
+
+        print("Fin des simulations : ", duree)
+        print("Temps d'attente moyen avant contrôle (sans file) : ", tempMoyenControlleTotal / 1000, 'h')
+        print("Temps d'attente moyen avant réparation : (sans file) ", tempMoyenReparationTotal / 1000, 'h')
+        print("Taux d'utilisation moyen du centre de réparation : ", tauxUtilisationReparation / 10, "%\n")
+        print("Attente max Q1 : ", maxAttenteQ1, 'h')
+        print("Attente max Q2 : ", maxAttenteQ2, 'h')
