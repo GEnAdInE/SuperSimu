@@ -24,10 +24,10 @@ class Echeancier(list):
 
 class Simulateur:
 
-    def __init__(self, duree):
+    def __init__(self, duree, nbBusAvantStop):
         self.duree_simulation = duree
         self.schedule = Echeancier()
-        
+        self.nbBusAvantStop = nbBusAvantStop
 
         # on initialise les variables une première fois pour qu'on puisse y avoir accès après
         # elle seront réinitialisées dans la méthode DebutSimu
@@ -41,6 +41,8 @@ class Simulateur:
         self.AireQ1 = 0
         self.AireQ2 = 0
         self.AireB2 = 0
+
+        self.nbBusPointControle = 0
 
     
     # Arrivee d'un bus
@@ -61,6 +63,13 @@ class Simulateur:
         
     # accès guichet controle
     def accesPosteControle(self):
+        self.nbBusPointControle += 1
+        
+        if (self.nbBusPointControle >= self.nbBusAvantStop):
+            self.schedule.insert(0, (self.FinSimulation, self.heureSysteme))
+            return
+
+        
         self.Q1 -= 1
         self.B1 = False
         self.schedule.append((self.departPosteControl, self.heureSysteme + np.uniform(15, 65)))
@@ -106,17 +115,19 @@ class Simulateur:
         self.AireB2 = 0
         
         self.schedule.append((self.arriveeBus, self.heureSysteme + np.exponential((3/4) * 60))) # 120min = 2h
-        self.schedule.append((self.FinSimulation, self.duree_simulation))
+       # self.schedule.append((self.FinSimulation, self.duree_simulation))
 
         self.attenteMaxQ1 = 0
         self.attenteMaxQ2 = 0
+
+        self.nbBusPointControle = 0
 
     def FinSimulation(self):
 
         self.schedule.clear()
         if (self.nbBus > 0):
             print("Temps d'attente moyen avant contrôle : ", (self.AireQ1 / self.nbBus) / 60)
-            print("Temps d'attente moyen avant contrôle (sans file) : ", (self.AireQ1 / (self.nbBus - self.Q1)) / 60, "(total bus contrôle : {} \tdans la file: {})".format(self.nbBus, self.Q1))
+            print("Temps d'attente moyen avant contrôle (sans file) : ", (self.AireQ1 / (self.nbBus - self.Q1)) / 60, "(total bus arrivés au contrôle : {} \tdans la file: {})".format(self.nbBusPointControle, self.Q1))
         if (self.nbBusRepair > 0):
             print("Temps d'attente moyen avant réparation : ", (self.AireQ2 / self.nbBusRepair) / 60)
             print("Temps d'attente moyen avant réparation (sans file) : ", (self.AireQ2 / (self.nbBusRepair - self.Q2)) / 60, "(total bus reparation : {} \tdans la file: {})".format(self.nbBusRepair, self.Q2))
@@ -152,8 +163,9 @@ class Simulateur:
             # Mise à jour de l'heure système
             self.heureSysteme = nextEvent[1]
 
-            # print("Heure système : ", self.heureSysteme / 60, "h")
-            # print("Evenement : ", nextEvent[0].__name__)
+            #print("Heure système : ", self.heureSysteme / 60, "h")
+            #print("Evenement : ", nextEvent[0].__name__)
+            
 
             # Execution de l'evenement
             nextEvent[0]()
@@ -163,6 +175,7 @@ class Simulateur:
 if __name__ == '__main__': 
 
     dureesSimulation = [40, 80, 160, 240]
+    nbBusAvantStop = int(input("Nombre de bus avant stop : "))
     for duree in dureesSimulation:
         tempMoyenControlleTotal = 0
         tempMoyenReparationTotal = 0
@@ -173,17 +186,15 @@ if __name__ == '__main__':
         maxAttenteQ2 = 0
         for i in range(0, 1000):
             print("Simulation n°", i)
-            simulateur = Simulateur(duree * 60)
+            simulateur = Simulateur(duree * 60, nbBusAvantStop)
             simulateur.run()
+
             tempMoyenControlleTotal += (simulateur.AireQ1 / (simulateur.nbBus - simulateur.Q1)) / 60
-            tempMoyenReparationTotal += (simulateur.AireQ2 / (simulateur.nbBusRepair - simulateur.Q2)) / 60
+            if ((simulateur.nbBusRepair - simulateur.Q2)):
+                tempMoyenReparationTotal += (simulateur.AireQ2 / (simulateur.nbBusRepair - simulateur.Q2)) / 60
             tauxUtilisationReparation += simulateur.AireB2 / (2 * simulateur.duree_simulation)
-            maxAttenteQ1 = max(maxAttenteQ1, simulateur.attenteMaxQ1)
-            maxAttenteQ2 = max(maxAttenteQ2, simulateur.attenteMaxQ2)
 
         print("Fin des simulations : ", duree)
         print("Temps d'attente moyen avant contrôle (sans file) : ", tempMoyenControlleTotal / 1000, 'h')
         print("Temps d'attente moyen avant réparation : (sans file) ", tempMoyenReparationTotal / 1000, 'h')
         print("Taux d'utilisation moyen du centre de réparation : ", tauxUtilisationReparation / 10, "%\n")
-        print("Attente max Q1 : ", maxAttenteQ1, 'h')
-        print("Attente max Q2 : ", maxAttenteQ2, 'h')
