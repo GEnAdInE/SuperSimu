@@ -156,7 +156,7 @@ class Simulateur:
         # Fin de la simulation
 
 if __name__ == '__main__': 
-    dureesSimulation = [240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240]
+    dureesSimulation = [40, 80, 160, 240]
     for duree in dureesSimulation:
         # print("Simulation de durée : ", duree)
         simulateur = Simulateur(duree * 60)
