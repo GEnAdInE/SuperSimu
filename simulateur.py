@@ -1,5 +1,6 @@
-import numpy.random as np
+import numpy as np
 from random import random
+import matplotlib.pyplot as plt
 class Echeancier(list):
     def __init__(self, *args, **kwargs):
         super(Echeancier, self).__init__(*args, **kwargs)
@@ -24,8 +25,7 @@ class Echeancier(list):
 
 class Simulateur:
 
-    def __init__(self, duree, nbBusAvantStop):
-        self.duree_simulation = duree
+    def __init__(self, nbBusAvantStop):
         self.schedule = Echeancier()
         self.nbBusAvantStop = nbBusAvantStop
 
@@ -43,17 +43,22 @@ class Simulateur:
         self.AireB2 = 0
 
         self.nbBusPointControle = 0
+        self.listeTempsAttenteControle = []
 
     
     # Arrivee d'un bus
     def arriveeBus(self):
+
+        # On ajoute l'heure système à la liste des temps d'attente
+        self.listeTempsAttenteControle.append(self.heureSysteme)
+
         self.nbBus += 1
 
         # Ajout d'un évenement d'arrivée dans la file de controle
         self.schedule.append((self.arriveFileControle, self.heureSysteme))
 
         # Ajout d'un nouvel evenement suivant la loi exponentielle de paramètre 0.5
-        self.schedule.append((self.arriveeBus,self.heureSysteme + np.exponential((3/4) * 60))) # 120min = 2h
+        self.schedule.append((self.arriveeBus,self.heureSysteme + np.random.exponential((3/4) * 60))) # 120min = 2h
             
     # arrivé bus dans la file de controle
     def arriveFileControle(self):
@@ -63,6 +68,9 @@ class Simulateur:
         
     # accès guichet controle
     def accesPosteControle(self):
+
+        self.listeTempsAttenteControle[self.nbBusPointControle] = self.heureSysteme - self.listeTempsAttenteControle[self.nbBusPointControle]
+
         self.nbBusPointControle += 1
         
         if (self.nbBusPointControle >= self.nbBusAvantStop):
@@ -72,7 +80,7 @@ class Simulateur:
         
         self.Q1 -= 1
         self.B1 = False
-        self.schedule.append((self.departPosteControl, self.heureSysteme + np.uniform(15, 65)))
+        self.schedule.append((self.departPosteControl, self.heureSysteme + np.random.uniform(15, 65)))
 
     def departPosteControl(self):
         
@@ -94,7 +102,7 @@ class Simulateur:
         
         self.Q2 -= 1
         self.B2 += 1
-        self.schedule.append((self.departReparation, self.heureSysteme + np.uniform(168, 330)))
+        self.schedule.append((self.departReparation, self.heureSysteme + np.random.uniform(168, 330)))
 
     def departReparation(self):
 
@@ -114,8 +122,7 @@ class Simulateur:
         self.AireQ2 = 0
         self.AireB2 = 0
         
-        self.schedule.append((self.arriveeBus, self.heureSysteme + np.exponential((3/4) * 60))) # 120min = 2h
-       # self.schedule.append((self.FinSimulation, self.duree_simulation))
+        self.schedule.append((self.arriveeBus, self.heureSysteme + np.random.exponential((3/4) * 60))) # 120min = 2h
 
         self.attenteMaxQ1 = 0
         self.attenteMaxQ2 = 0
@@ -123,26 +130,10 @@ class Simulateur:
         self.nbBusPointControle = 0
 
     def FinSimulation(self):
-
         self.schedule.clear()
-        if (self.nbBus > 0):
-            print("Temps d'attente moyen avant contrôle : ", (self.AireQ1 / self.nbBus) / 60)
-            print("Temps d'attente moyen avant contrôle (sans file) : ", (self.AireQ1 / (self.nbBus - self.Q1)) / 60, "(total bus arrivés au contrôle : {} \tdans la file: {})".format(self.nbBusPointControle, self.Q1))
-        if (self.nbBusRepair > 0):
-            print("Temps d'attente moyen avant réparation : ", (self.AireQ2 / self.nbBusRepair) / 60)
-            print("Temps d'attente moyen avant réparation (sans file) : ", (self.AireQ2 / (self.nbBusRepair - self.Q2)) / 60, "(total bus reparation : {} \tdans la file: {})".format(self.nbBusRepair, self.Q2))
         
-        print("Temps d'utilisation moyen du centre de réparation : ", self.AireB2 / (2 * self.duree_simulation), "\n")
-
-    def MAJAires(self, nextDate):
-        self.AireQ1 += self.Q1 * (nextDate - self.heureSysteme)
-        self.AireQ2 += self.Q2 * (nextDate - self.heureSysteme)
-        self.AireB2 += self.B2 * (nextDate - self.heureSysteme)
-        if (self.nbBus > 0):
-            self.attenteMaxQ1 = max((self.AireQ1 / self.nbBus) / 60, self.attenteMaxQ1)
-            
-        if (self.nbBusRepair > 0):
-            self.attenteMaxQ2 = max((self.AireQ2 / self.nbBusRepair) / 60, self.attenteMaxQ2)
+        
+        
 
     def run(self):
         # init heure système
@@ -157,44 +148,84 @@ class Simulateur:
             # Extraction du prochain evenement
             nextEvent = self.schedule.prochain()
 
-            # Mise à jour des aires 
-            self.MAJAires(nextEvent[1])
-
             # Mise à jour de l'heure système
             self.heureSysteme = nextEvent[1]
 
-            #print("Heure système : ", self.heureSysteme / 60, "h")
-            #print("Evenement : ", nextEvent[0].__name__)
-            
 
             # Execution de l'evenement
             nextEvent[0]()
 
         # Fin de la simulation
 
+
+
 if __name__ == '__main__': 
 
-    dureesSimulation = [40, 80, 160, 240]
-    nbBusAvantStop = int(input("Nombre de bus avant stop : "))
-    for duree in dureesSimulation:
-        tempMoyenControlleTotal = 0
-        tempMoyenReparationTotal = 0
-        tauxUtilisationReparation = 0
-        Q1total = 0
-        Q2total = 0
-        maxAttenteQ1 = 0
-        maxAttenteQ2 = 0
-        for i in range(0, 1000):
-            print("Simulation n°", i)
-            simulateur = Simulateur(duree * 60, nbBusAvantStop)
-            simulateur.run()
+    nbBusAvantStop = int(10E4)
+    nbIterationSimu = int(10E4)
 
-            tempMoyenControlleTotal += (simulateur.AireQ1 / (simulateur.nbBus - simulateur.Q1)) / 60
-            if ((simulateur.nbBusRepair - simulateur.Q2)):
-                tempMoyenReparationTotal += (simulateur.AireQ2 / (simulateur.nbBusRepair - simulateur.Q2)) / 60
-            tauxUtilisationReparation += simulateur.AireB2 / (2 * simulateur.duree_simulation)
+    # Matrice nbIterationSimu x nbBusAvantStop
+    matriceTempsAttente = np.zeros((nbIterationSimu, nbBusAvantStop))
 
-        print("Fin des simulations : ", duree)
-        print("Temps d'attente moyen avant contrôle (sans file) : ", tempMoyenControlleTotal / 1000, 'h')
-        print("Temps d'attente moyen avant réparation : (sans file) ", tempMoyenReparationTotal / 1000, 'h')
-        print("Taux d'utilisation moyen du centre de réparation : ", tauxUtilisationReparation / 10, "%\n")
+
+    
+    # Affiche un graphique de la distribution des temps d'attente
+    def afficherGraphiqueTempsAttente(liste):
+        plt.plot(liste)
+        plt.title("Temps d'attente moyen d'un bus avant réparation")
+        plt.xlabel("Numéro du bus dans le système")
+        plt.ylabel("Temps d'attente avant contrôle (min)")
+        plt.margins(0)
+
+        
+    
+
+    def moyennesWelch(matrice):
+        moyennes = np.zeros((matrice.shape[1]))
+        
+        for i in range(0, matrice.shape[1]):
+            moyennes[i] = np.mean(matrice[:, i])
+                
+        return moyennes
+
+
+
+    def moyennesLisses(moyennes, w = 5):
+        yW=0
+        moyennesLisses = []
+
+        for i in range (len(moyennes)):
+            
+            if i <= w :
+                for j in range (-(i-1),i):
+                    yW = yW + moyennes[i+j]
+                yW = yW / (2*i - 1 )
+
+            elif w + 1 <= i <= len(moyennes) - w :
+                for j in range (-w,w):
+                    yW = yW + moyennes[i+j]
+                yW = yW / (2*w + 1)
+
+            moyennesLisses.append(yW)
+        return moyennesLisses
+
+
+    for i in range(0, nbIterationSimu):
+        print("Simulation n°{}".format(i))
+        simulateur = Simulateur(nbBusAvantStop)
+        simulateur.run()
+
+        temp = simulateur.listeTempsAttenteControle
+        # On supprime les valeurs après l'indice nbBusAvantStop
+        del temp[nbBusAvantStop:]
+
+        matriceTempsAttente[i] = temp
+
+    
+
+    moyennes = moyennesWelch(matriceTempsAttente)
+    afficherGraphiqueTempsAttente(moyennes)
+    afficherGraphiqueTempsAttente(moyennesLisses(moyennes))
+
+    plt.legend(["Moyennes Welch", "Moyennes de Welch lissées"])
+    plt.show()
