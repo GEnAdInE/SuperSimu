@@ -174,7 +174,7 @@ if __name__ == '__main__':
     # Affiche un graphique de la distribution des temps d'attente
     def afficherGraphiqueTempsAttente(liste):
         plt.plot(liste)
-        plt.title("Temps d'attente moyen d'un bus avant réparation")
+        plt.title("Temps d'attente moyen d'un bus avant contrôle")
         plt.xlabel("Numéro du bus dans le système")
         plt.ylabel("Temps d'attente avant contrôle (min)")
         plt.margins(0)
@@ -241,6 +241,10 @@ if __name__ == '__main__':
     moyennes = moyennesWelch(matriceTempsAttente)
     afficherGraphiqueTempsAttente(moyennes)
     afficherGraphiqueTempsAttente(moyennesLisses(moyennes))
+
+    # Faire la moyenne des 200 dernières moyennes   
+    moyenne200DernieresMoyennes = np.mean(moyennes[-(moyennes.size-200):])
+    print(moyenne200DernieresMoyennes)
 
     plt.legend(["Moyennes Welch", "Moyennes de Welch lissées"])
     plt.show()
