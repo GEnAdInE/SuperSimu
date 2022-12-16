@@ -1,4 +1,5 @@
 import numpy as np
+import threading
 from random import random
 import matplotlib.pyplot as plt
 class Echeancier(list):
@@ -25,7 +26,8 @@ class Echeancier(list):
 
 class Simulateur:
 
-    def __init__(self, nbBusAvantStop):
+    def __init__(self, numSimu, nbBusAvantStop):
+        self.numSimu = numSimu
         self.schedule = Echeancier()
         self.nbBusAvantStop = nbBusAvantStop
 
@@ -161,7 +163,7 @@ class Simulateur:
 
 if __name__ == '__main__': 
 
-    nbBusAvantStop = int(10E4)
+    nbBusAvantStop = int(10E2)
     nbIterationSimu = int(10E4)
 
     # Matrice nbIterationSimu x nbBusAvantStop
@@ -209,17 +211,30 @@ if __name__ == '__main__':
             moyennesLisses.append(yW)
         return moyennesLisses
 
+    threads = []
+    simus = []
 
     for i in range(0, nbIterationSimu):
-        print("Simulation n°{}".format(i))
-        simulateur = Simulateur(nbBusAvantStop)
-        simulateur.run()
+        #print("Simulation n°{}".format(i))
+        simulateur = Simulateur(i, nbBusAvantStop)
+        simus.append(simulateur)
+        
+        t = threading.Thread(target=simulateur.run)
+        threads.append(t)
+        t.start()
+
+
+    for t in threads:
+        t.join()
+
+    
+    for simulateur in simus:
 
         temp = simulateur.listeTempsAttenteControle
         # On supprime les valeurs après l'indice nbBusAvantStop
         del temp[nbBusAvantStop:]
 
-        matriceTempsAttente[i] = temp
+        matriceTempsAttente[simulateur.numSimu] = temp
 
     
 
